@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/jinzhu/gorm"
 	"github.com/tshubham7/go-microservices/invoice/models"
@@ -9,6 +10,7 @@ import (
 
 type invoice struct {
 	db *gorm.DB
+	l  *log.Logger
 }
 
 // InvoiceRepo ..
@@ -24,8 +26,8 @@ type InvoiceRepo interface {
 }
 
 // NewInvoiceRepo ...
-func NewInvoiceRepo(db *gorm.DB) InvoiceRepo {
-	return &invoice{db}
+func NewInvoiceRepo(db *gorm.DB, l *log.Logger) InvoiceRepo {
+	return &invoice{db, l}
 }
 
 // Create ...

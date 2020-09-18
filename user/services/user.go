@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log"
+
 	"github.com/go-playground/validator"
 	"github.com/tshubham7/go-microservices/user/models"
 	"github.com/tshubham7/go-microservices/user/repository"
@@ -8,6 +10,7 @@ import (
 
 type user struct {
 	a repository.UserRepo
+	l *log.Logger
 }
 
 // UserUpdateParams ...
@@ -62,8 +65,8 @@ type UserService interface {
 }
 
 // NewUserService ...
-func NewUserService(a repository.UserRepo) UserService {
-	return &user{a}
+func NewUserService(a repository.UserRepo, l *log.Logger) UserService {
+	return &user{a, l}
 }
 
 // Create ...

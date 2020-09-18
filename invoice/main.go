@@ -12,20 +12,20 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-var l = log.New(os.Stdout, "invoice-service ", log.LstdFlags)
+var lg = log.New(os.Stdout, "invoice-service ", log.LstdFlags)
 
 func main() {
 
 	wdb, err := db.GetDatabase()
 	if err != nil {
-		l.Fatal(err)
+		lg.Fatal(err)
 	}
 
 	db.RunMigrations(wdb)
-	l.Println("successfully migrated models")
+	lg.Println("successfully migrated models")
 
 	gs := grpc.NewServer()
-	is := server.NewInvoice(wdb)
+	is := server.NewInvoice(wdb, lg)
 
 	protos.RegisterInvoiceServer(gs, is)
 
@@ -36,6 +36,6 @@ func main() {
 		panic(err)
 	}
 
-	l.Println("listening to port :9002")
+	lg.Println("listening to port :9002")
 	gs.Serve(nt)
 }

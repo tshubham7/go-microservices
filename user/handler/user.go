@@ -6,13 +6,15 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	protos "github.com/tshubham7/go-microservices/invoice/protos/invoice"
 	"github.com/tshubham7/go-microservices/user/repository"
 	"github.com/tshubham7/go-microservices/user/services"
 )
 
 type user struct {
-	u repository.UserRepo
-	l *log.Logger
+	u       repository.UserRepo
+	l       *log.Logger
+	invoice *services.Invoice
 }
 
 // UserHandler ...
@@ -31,13 +33,15 @@ type UserHandler interface {
 }
 
 // NewUserHandler ...
-func NewUserHandler(u repository.UserRepo, l *log.Logger) UserHandler {
-	return &user{u: u, l: l}
+func NewUserHandler(u repository.UserRepo, l *log.Logger, cc protos.InvoiceClient) UserHandler {
+
+	in := services.NewInvoiceService(l, cc)
+	return &user{u: u, l: l, invoice: in}
 }
 
 // Create ...
 func (u user) Create() gin.HandlerFunc {
-	sr := services.NewUserService(u.u)
+	sr := services.NewUserService(u.u, u.l)
 
 	return func(c *gin.Context) {
 		var err error
@@ -61,7 +65,7 @@ func (u user) Create() gin.HandlerFunc {
 			return
 		}
 
-		u, err := sr.Create(params)
+		usr, err := sr.Create(params)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": "failed to create user",
@@ -71,13 +75,15 @@ func (u user) Create() gin.HandlerFunc {
 		}
 
 		// call invoice service
-		c.JSON(http.StatusOK, u)
+		go u.invoice.Create(int32(usr.ID), "create")
+
+		c.JSON(http.StatusOK, usr)
 	}
 }
 
 // List ...
 func (u user) List() gin.HandlerFunc {
-	sr := services.NewUserService(u.u)
+	sr := services.NewUserService(u.u, u.l)
 
 	return func(c *gin.Context) {
 		q, err := validateQueries(
@@ -109,7 +115,7 @@ func (u user) List() gin.HandlerFunc {
 
 // Delete ...
 func (u user) Delete() gin.HandlerFunc {
-	sr := services.NewUserService(u.u)
+	sr := services.NewUserService(u.u, u.l)
 
 	return func(c *gin.Context) {
 		id := c.Param("id")
@@ -132,13 +138,16 @@ func (u user) Delete() gin.HandlerFunc {
 			return
 		}
 
+		// call invoice service
+		go u.invoice.Create(int32(uid), "delete")
+
 		c.JSON(http.StatusOK, gin.H{"message": "successfully deleted"})
 	}
 }
 
 // Detail ...
 func (u user) Update() gin.HandlerFunc {
-	sr := services.NewUserService(u.u)
+	sr := services.NewUserService(u.u, u.l)
 
 	return func(c *gin.Context) {
 		id := c.Param("id")
@@ -169,6 +178,9 @@ func (u user) Update() gin.HandlerFunc {
 			})
 			return
 		}
+
+		// call invoice service
+		go u.invoice.Create(int32(uid), "update")
 
 		c.JSON(http.StatusOK, a)
 	}
