@@ -1,0 +1,17 @@
+syntax="proto3";
+
+package invoice;
+
+service Invoice {
+    rpc Create(CreateRequest) returns (CreateResponse);
+}
+
+message CreateRequest {
+    string Action = 1;
+    int32 UserID = 2;
+}
+
+message CreateResponse {
+    string Message = 1;
+    bool Status = 2;
+}
