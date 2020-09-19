@@ -83,6 +83,11 @@
     for eg. http://172.17.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0
 
 
+# quick test
+
+    http://172.17.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0
+
+
 # endpoints/api doc
 
     find the swagger documentation for restful api at dir
