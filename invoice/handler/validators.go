@@ -18,8 +18,8 @@ const (
 	// CreatedAt ... sort by updated_at
 	CreatedAt = Sort("created_at")
 
-	// Name ... sort by name
-	Name = Sort("name")
+	// Action ... sort by action
+	Action = Sort("action")
 
 	// Ascending ... ascending order
 	Ascending = Order("asc")
@@ -31,7 +31,7 @@ const (
 var sortOptions = map[Sort]Sort{
 	CreatedAt: CreatedAt,
 	UpdatedAt: UpdatedAt,
-	Name:      Name,
+	Action:    Action,
 }
 
 // Valid ... check if it's valid

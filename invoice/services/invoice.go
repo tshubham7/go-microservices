@@ -62,8 +62,8 @@ type InvoiceService interface {
 	// list all invoices
 	ListAll(queries *InvoiceListQueryParams) ([]models.Invoice, error)
 
-	// delete invoice
-	Delete(id int32) error
+	// list invoices by user id
+	ListByUser(queries *InvoiceListQueryParams, userID int32) ([]models.Invoice, error)
 }
 
 // NewInvoiceService ...
@@ -85,7 +85,7 @@ func (in invoice) ListAll(q *InvoiceListQueryParams) ([]models.Invoice, error) {
 	return in.r.ListAll(q.Sort, q.Order, q.Limit, q.Offset)
 }
 
-// Delete ...
-func (in invoice) Delete(id int32) error {
-	return in.r.Delete(id)
+// ListByUser ...
+func (in invoice) ListByUser(q *InvoiceListQueryParams, uid int32) ([]models.Invoice, error) {
+	return in.r.ListByUser(q.Sort, q.Order, q.Limit, q.Offset, uid)
 }

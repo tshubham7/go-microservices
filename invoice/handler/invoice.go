@@ -17,14 +17,8 @@ type invoice struct {
 
 // InvoiceHandler ...
 type InvoiceHandler interface {
-	// create user
-	Create() gin.HandlerFunc
-
 	// list user
 	List() gin.HandlerFunc
-
-	// delete user
-	Delete() gin.HandlerFunc
 }
 
 // NewInvoiceHandler ...
@@ -32,49 +26,8 @@ func NewInvoiceHandler(r repository.InvoiceRepo, l *log.Logger) InvoiceHandler {
 	return &invoice{r: r, l: l}
 }
 
-// Create ...
-func (in invoice) Create() gin.HandlerFunc {
-	sr := services.NewInvoiceService(in.r)
-
-	return func(c *gin.Context) {
-		var err error
-
-		var params services.InvoiceCreateRequest
-		err = c.Bind(&params)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error":   err.Error(),
-				"message": "missing or invalid params",
-			})
-			return
-		}
-
-		err = params.Validate()
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error":   err.Error(),
-				"message": "missing or invalid params",
-			})
-			return
-		}
-
-		u, err := sr.Create(params)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "failed to create invoice",
-				"error":   err.Error(),
-			})
-			return
-		}
-
-		// call invoice service
-		c.JSON(http.StatusOK, u)
-	}
-}
-
 // List ...
 func (in invoice) List() gin.HandlerFunc {
-	sr := services.NewInvoiceService(in.r)
 
 	return func(c *gin.Context) {
 		q, err := validateQueries(
@@ -91,46 +44,67 @@ func (in invoice) List() gin.HandlerFunc {
 			return
 		}
 
-		u, err := sr.ListAll(q)
+		uid := c.Query("userID")
+		if uid == "" {
+			// list all invoices
+			in.listAll(c, q)
+			return
+		}
+
+		// else list invoice by user
+		id, err := strconv.Atoi(uid)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "failed to fetch invoices",
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "missing or invalid params: userID",
 				"error":   err.Error(),
 			})
 			return
 		}
 
-		c.JSON(http.StatusOK, u)
+		in.listByUser(c, q, int32(id))
 	}
 }
 
-// Delete ...
-func (in invoice) Delete() gin.HandlerFunc {
+// listAll ...
+func (in invoice) listAll(c *gin.Context, queries *services.InvoiceListQueryParams) {
 	sr := services.NewInvoiceService(in.r)
-
-	return func(c *gin.Context) {
-		id := c.Param("id")
-
-		uid, err := strconv.Atoi(id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "missing or invalid params: id ",
-				"error":   err,
-			})
-			return
-		}
-
-		err = sr.Delete(int32(uid))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "failed to delete invoice",
-				"error":   err.Error(),
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"message": "successfully deleted"})
+	u, err := sr.ListAll(queries)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to fetch invoices",
+			"error":   err.Error(),
+		})
+		return
 	}
+	resp := ListResponse{
+		Limit: queries.Limit, Offset: queries.Offset, Count: int32(len(u)), Result: u}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// listByUser ...
+func (in invoice) listByUser(c *gin.Context, queries *services.InvoiceListQueryParams, uid int32) {
+	sr := services.NewInvoiceService(in.r)
+	u, err := sr.ListByUser(queries, uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to fetch invoices",
+			"error":   err.Error(),
+		})
+		return
+	}
+	resp := ListResponse{
+		Limit: queries.Limit, Offset: queries.Offset, Count: int32(len(u)), Result: u}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// ListResponse ...
+type ListResponse struct {
+	Limit  int32       `json:"limit"`
+	Offset int32       `json:"offset"`
+	Count  int32       `json:"count"`
+	Result interface{} `json:"results"`
 }
 
 // validateQueries validating query params

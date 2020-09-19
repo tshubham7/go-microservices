@@ -33,9 +33,9 @@ type UserHandler interface {
 }
 
 // NewUserHandler ...
-func NewUserHandler(u repository.UserRepo, l *log.Logger, cc protos.InvoiceClient) UserHandler {
-
-	in := services.NewInvoiceService(l, cc)
+func NewUserHandler(u repository.UserRepo, lr repository.LogRepo, l *log.Logger, cc protos.InvoiceClient) UserHandler {
+	ls := services.NewLogService(lr, l)
+	in := services.NewInvoiceService(l, cc, ls)
 	return &user{u: u, l: l, invoice: in}
 }
 
@@ -109,7 +109,10 @@ func (u user) List() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, u)
+		resp := ListResponse{
+			Limit: q.Limit, Offset: q.Offset, Count: int32(len(u)), Result: u}
+
+		c.JSON(http.StatusOK, resp)
 	}
 }
 
@@ -218,4 +221,12 @@ func validateQueries(args ...string) (*services.UserListQueryParams, error) {
 		Order:  order.String(),
 		Limit:  limit.Int(),
 		Offset: offset.Int()}, nil
+}
+
+// ListResponse ...
+type ListResponse struct {
+	Limit  int32       `json:"limit"`
+	Offset int32       `json:"offset"`
+	Count  int32       `json:"count"`
+	Result interface{} `json:"results"`
 }

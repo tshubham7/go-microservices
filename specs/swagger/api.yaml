@@ -1,0 +1,497 @@
+openapi: 3.0.1
+info:
+  title: localhost:8080/
+  description: Microservice api
+  version: ${api_version}
+servers:
+  - url: localhost:8080/
+    description: ${server_description}
+  - url: https://${domain_name}/${api_stage}
+    description: ${server_description}
+paths:
+
+# User
+  /api/user:
+    post:
+      tags:
+        - User
+      description: Create user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUser"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateUserSuccess"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+    get:
+      tags:
+        - User
+      description: List Users
+      parameters:
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: item limit per page
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: page offset
+        - in: query
+          name: sort
+          required: true
+          schema:
+            type: string
+            example: 
+              sort by date of creation: "created_at"
+              sort by date of updation: "updated_at"
+              sort by name: "name"
+          description: The sorting factor
+        - in: query
+          name: order
+          required: true
+          schema:
+            type: string
+            example: 
+              decreasing order(default): "asc"
+              increasing order: "desc"
+          description: The sorting order
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListUser"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  /api/user/{id}:
+    delete:
+      tags:
+        - User
+      description: List Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: user id
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteUserSuccess"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+    patch:
+      tags:
+        - User
+      description: Update user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: user id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUser"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateUserSuccess"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  
+# Invoice
+  /api/invoice:
+    get:
+      tags:
+        - Invoice
+      description: List Invoice
+      parameters:
+        - in: query
+          name: userID
+          required: false
+          schema:
+            type: integer
+            example: 5
+          description: user id, require if you want to list by user
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: item limit per page
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: page offset
+        - in: query
+          name: sort
+          required: true
+          schema:
+            type: string
+            example: 
+              sort by date of creation: "created_at"
+              sort by date of updation: "updated_at"
+              sort by action: "action"
+          description: The sorting factor
+        - in: query
+          name: order
+          required: true
+          schema:
+            type: string
+            example: 
+              decreasing order(default): "asc"
+              increasing order: "desc"
+          description: The sorting order
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListUser"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  
+# ServiceLogs
+  /api/user/service-logs:
+    get:
+      tags:
+        - ServiceLogs
+      description: List Logs
+      parameters:
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: item limit per page
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: page offset
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListServiceLogs"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  
+  
+
+components:
+  schemas:
+  # General
+    BadRequestResponse:
+      type: object
+      items:
+         properties:
+          error:
+            type: string
+            example: "multiple words sent"
+      example: {
+        "error": "multiple words sent"
+      }
+    ServerErrorResponse:
+      type: object
+      items:
+         properties:
+          error:
+            type: string
+            example: "server error message"
+      example: {
+        "error": "server error message"
+      }
+     
+  # User
+    CreateUser:
+      example: {
+          "name": "Sagar singh",
+          "email": "sagar@gmail.com",
+          "phone": "+918962991115"
+      }
+
+    CreateUserSuccess:
+      example: {
+          "id": 18,
+          "createdAt": "2020-09-18T23:09:33.386066055+05:30",
+          "updatedAt": "2020-09-18T23:09:33.386066055+05:30",
+          "deletedAt": null,
+          "name": "Sagar singh",
+          "email": "sagar@gmail.com",
+          "phone": "+918962991115"
+      }
+    UpdateUser:
+      example: {
+          "name": "sagar dhanera",
+          "email": "sagar@gmail.com"
+      }
+    UpdateUserSuccess:
+      example: {
+          "id": 18,
+          "createdAt": "2020-09-18T23:09:33.386066+05:30",
+          "updatedAt": "2020-09-18T23:09:33.386066+05:30",
+          "deletedAt": null,
+          "name": "sagar dhanera",
+          "email": "sagar@gmail.com",
+          "phone": "+918962991115"
+      }
+    ListUser:
+      example: {
+          "limit": 3,
+          "offset": 0,
+          "count": 3,
+          "results": [
+              {
+                  "id": 18,
+                  "createdAt": "2020-09-18T23:09:33.386066+05:30",
+                  "updatedAt": "2020-09-18T23:09:33.386066+05:30",
+                  "deletedAt": null,
+                  "name": "Sagar singh",
+                  "email": "sagar@gmail.com",
+                  "phone": "+918962991115"
+              },
+              {
+                  "id": 17,
+                  "createdAt": "2020-09-18T19:18:15.308722+05:30",
+                  "updatedAt": "2020-09-18T19:18:15.308722+05:30",
+                  "deletedAt": null,
+                  "name": "Vishal singh",
+                  "email": "vishal@gmail.com",
+                  "phone": "+918962991114"
+              },
+              {
+                  "id": 15,
+                  "createdAt": "2020-09-18T17:25:15.610058+05:30",
+                  "updatedAt": "2020-09-18T17:25:15.610058+05:30",
+                  "deletedAt": null,
+                  "name": "Manish dembele",
+                  "email": "dembele@gmail.com",
+                  "phone": "+918962991112"
+              }
+          ]
+      }
+    DeleteUserSuccess:
+      example: {
+        "message": "successfully deleted"
+      }
+      
+  # Invoice
+    ListInvoice:
+      example: {
+        "limit": 4,
+        "offset": 0,
+        "count": 4,
+        "results": [
+            {
+                "id": 1,
+                "createdAt": "2020-09-18T16:04:41.982145+05:30",
+                "updatedAt": "2020-09-18T16:04:41.982145+05:30",
+                "deletedAt": null,
+                "userId": 1,
+                "action": "create"
+            },
+            {
+                "id": 3,
+                "createdAt": "2020-09-18T17:25:16.368032+05:30",
+                "updatedAt": "2020-09-18T17:25:16.368032+05:30",
+                "deletedAt": null,
+                "userId": 15,
+                "action": "create"
+            },
+            {
+                "id": 2,
+                "createdAt": "2020-09-18T17:17:10.872852+05:30",
+                "updatedAt": "2020-09-18T17:17:10.872852+05:30",
+                "deletedAt": null,
+                "userId": 13,
+                "action": "create"
+            },
+            {
+                "id": 8,
+                "createdAt": "2020-09-18T19:18:15.473246+05:30",
+                "updatedAt": "2020-09-18T19:18:15.473246+05:30",
+                "deletedAt": null,
+                "userId": 17,
+                "action": "create"
+            }
+        ]
+    }
+      
+  # ServiceLogs
+    ListServiceLogs:
+      example: {
+            "limit": 10,
+            "offset": 0,
+            "count": 4,
+            "results": [
+                {
+                    "id": 1,
+                    "createdAt": "2020-09-19T11:21:43.784452651+05:30",
+                    "updatedAt": "2020-09-19T11:21:43.784452651+05:30",
+                    "deletedAt": null,
+                    "userId": 1,
+                    "action": "",
+                    "errorMessage": "",
+                    "successStatus": true
+                },
+                {
+                    "id": 2,
+                    "createdAt": "2020-09-19T11:22:07.519616029+05:30",
+                    "updatedAt": "2020-09-19T11:22:07.519616029+05:30",
+                    "deletedAt": null,
+                    "userId": 2,
+                    "action": "",
+                    "errorMessage": "",
+                    "successStatus": true
+                },
+                {
+                    "id": 3,
+                    "createdAt": "2020-09-19T11:25:04.276256542+05:30",
+                    "updatedAt": "2020-09-19T11:25:04.276256542+05:30",
+                    "deletedAt": null,
+                    "userId": 3,
+                    "action": "create",
+                    "errorMessage": "",
+                    "successStatus": true
+                },
+                {
+                    "id": 4,
+                    "createdAt": "2020-09-19T11:25:54.116124826+05:30",
+                    "updatedAt": "2020-09-19T11:25:54.116124826+05:30",
+                    "deletedAt": null,
+                    "userId": 3,
+                    "action": "update",
+                    "errorMessage": "",
+                    "successStatus": true
+                }
+            ]
+        }
+        
+  headers:
+      X-Requested-With:
+        description: CORS origin sites allowed
+        style: simple
+        explode: false
+        schema:
+          type: string
+      Access-Control-Allow-Origin:
+        description: CORS origin sites allowed
+        style: simple
+        explode: false
+        schema:
+          type: string
+      Access-Control-Allow-Methods:
+        description: CORS http methods allows
+        style: simple
+        explode: false
+        schema:
+          type: string
+      Access-Control-Allow-Headers:
+        description: CORS request headers allowed
+        style: simple
+        explode: false
+        schema:
+          type: string
+  securitySchemes:
+    api_key:
+      in: header
+      name: x-api-key
+      type: apiKey

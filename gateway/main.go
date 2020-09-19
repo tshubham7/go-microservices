@@ -12,30 +12,34 @@ import (
 func main() {
 	http.HandleFunc("/", forwardUserServiceRequest)
 	fmt.Println("gateway listening to :8080")
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func forwardUserServiceRequest(w http.ResponseWriter, r *http.Request) {
+
+	host := strings.Split(r.Host, ":")[0]
+	host = "http://" + host
 	path := r.RequestURI
 	var url *url.URL
 	if strings.Contains(path, "api/user") {
-		url = getUserServiceURL(path)
+		url = getUserServiceURL(host)
 	}
 
 	if strings.Contains(path, "api/invoice") {
-		url = getInvoiceServiceURL(path)
+		url = getInvoiceServiceURL(host)
 	}
 
 	rProxy := httputil.NewSingleHostReverseProxy(url)
 	rProxy.ServeHTTP(w, r)
 }
 
-func getUserServiceURL(path string) *url.URL {
-	url, _ := url.Parse("http://127.0.0.1:9001")
+func getUserServiceURL(host string) *url.URL {
+	url, _ := url.Parse(host + ":9001")
 	return url
 }
 
-func getInvoiceServiceURL(path string) *url.URL {
-	url, _ := url.Parse("http://127.0.0.1:9002")
+func getInvoiceServiceURL(host string) *url.URL {
+	url, _ := url.Parse(host + ":9002")
 	return url
 }

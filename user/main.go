@@ -23,7 +23,7 @@ func main() {
 	db.RunMigrations(wdb)
 	l.Println("successfully migrated models")
 
-	conn, err := grpc.Dial("localhost:9002", grpc.WithInsecure()) // local
+	conn, err := grpc.Dial("172.17.0.1:5000", grpc.WithInsecure()) // local
 	if err != nil {
 		panic(err)
 	}
@@ -35,19 +35,31 @@ func main() {
 	r := gin.Default()
 
 	ur := repository.NewUserRepo(wdb)
-	user(r, ur, cc)
+	lr := repository.NewLogRepo(wdb)
+
+	user(r, ur, lr, cc)
+	servicelogs(r, lr)
 
 	r.Run(":9001")
 }
 
-func user(r *gin.Engine, u repository.UserRepo, cc protos.InvoiceClient) {
-	s := handler.NewUserHandler(u, l, cc)
+// user routes
+func user(r *gin.Engine, u repository.UserRepo, lr repository.LogRepo, cc protos.InvoiceClient) {
+	s := handler.NewUserHandler(u, lr, l, cc)
 	route := r.Group("/api/user")
 	{
-		route.POST("/", s.Create())
-		route.GET("/", s.List())
+		route.POST("", s.Create())
+		route.GET("", s.List())
 		route.DELETE("/:id", s.Delete())
 		route.PATCH("/:id", s.Update())
 	}
+}
 
+// servicelogs routes
+func servicelogs(r *gin.Engine, lr repository.LogRepo) {
+	lh := handler.NewLogHandler(lr, l)
+	route := r.Group("/api/user/service-logs")
+	{
+		route.GET("", lh.List())
+	}
 }
