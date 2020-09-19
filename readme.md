@@ -8,6 +8,7 @@
     Gorm
     Gin
     Restful API
+    Swager
     Docker -> find the docker section below to use it
 
 
@@ -41,15 +42,6 @@
     I have downloaded protoc-3.13.0-linux-x86_32.zip file as i am having linux system.
     unzip the file and put the content of the bin folder to your go path go/bin folder so that you can access it like other services,
     you can also set the path its up to you
-
-
-# api doc
-
-    find the swagger documentation for restful api at dir
-    specs/swagger/api.yaml
-
-    find the postman collection for restful api at dir
-    specs/postman/collection.json
 
 
 # services
@@ -89,3 +81,13 @@
     after running all these images,
     use http://172.17.0.1:8080/ as host if you are running docker images 
     for eg. http://172.17.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0
+
+
+# endpoints/api doc
+
+    find the swagger documentation for restful api at dir
+    specs/swagger/api.yaml
+
+    find the postman collection for restful api at dir
+    specs/postman/collection.json
+
