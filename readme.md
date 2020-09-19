@@ -8,6 +8,12 @@
     Gorm
     Gin
     Restful API
+    Docker -> find the docker section below to use it
+
+
+# direct way to test?
+
+    please find the docker section below.
 
 
 # What's in it?
@@ -49,18 +55,14 @@
 # services
 
     find the following services
-    user service
-    invoice service
+    1. User service
+    2. Invoice service
+    3. The Gateway to interact with these services
 
 
-# the gateway
+# how to start?
 
-    use gateway to interact with these services
-
-
-# run
-
-    run the gateway
+    run the gateway server
     run the invoice server
     run the user server
     
@@ -76,7 +78,7 @@
     invoice service:
         $ docker pull tshubham7/go-microservices-invoice-service:latest
     run using command:
-        $ docker run -it -p 9002:9002 tshubham7/go-microservices-invoice-service
+        $ docker run -it -p 9002:9002 -p 5000:5000 tshubham7/go-microservices-invoice-service
 
     user service:
         $ docker pull tshubham7/go-microservices-user-service:latest
@@ -84,3 +86,6 @@
         $ docker run -it -p 9001:9001 tshubham7/go-microservices-user-service
 
     
+    after running all these images,
+    use http://172.17.0.1:8080/ as host if you are running docker images 
+    for eg. http://172.17.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0

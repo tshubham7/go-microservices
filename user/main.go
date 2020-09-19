@@ -23,7 +23,7 @@ func main() {
 	db.RunMigrations(wdb)
 	l.Println("successfully migrated models")
 
-	conn, err := grpc.Dial("172.17.0.1:5000", grpc.WithInsecure()) // local
+	conn, err := grpc.Dial("localhost:5000", grpc.WithInsecure()) // local
 	if err != nil {
 		panic(err)
 	}

@@ -9,6 +9,6 @@ COPY . /src
 
 RUN go build -o main
 
-EXPOSE 9002
+EXPOSE 9002 5000
 
 CMD ["./main"]
