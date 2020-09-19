@@ -78,21 +78,23 @@
         $ docker run -it -p 9001:9001 tshubham7/go-microservices-user-service
 
     
-    after running all these images,
-    use http://172.17.0.1:8080/ as host if you are running docker images 
-    for eg. http://172.17.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0
+    note: 
+        if you are getting 502 error while using these images, 
+        use http://172.17.0.1:8080/ as host if you are running docker images 
+        for eg. http://172.17.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0
 
 
 # quick test
 
-    http://172.17.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0
+    run this on your browser http://127.0.0.1:8080/api/invoice?sort=created_at&order=desc&limit=10&offset=0
+    use http://172.17.0.1:8080/ if you are getting 502
 
 
 # endpoints/api doc
 
-    find the swagger documentation for restful api at dir
-    specs/swagger/api.yaml
+    find the swagger documentation for restful api at dir. specs/swagger/api.yaml
+    copy the content of this file, then open https://editor.swagger.io/# and paste the content. 
 
-    find the postman collection for restful api at dir
-    specs/postman/collection.json
+    find the postman collection for restful api at dir. specs/postman/collection.json
+    download the file, open the your postman tool then import this json file into it.
 
